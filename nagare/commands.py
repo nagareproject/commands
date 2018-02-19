@@ -18,13 +18,13 @@ class Commands(plugins.Plugins, plugin.Plugin):
     DESC = '<subcommands>'
 
     def __init__(self, name, dist, entry_points):
-        self.name = name
         self.entry_points = entry_points
-        super(Commands, self).__init__({}, entry_points=entry_points)
+        plugins.Plugins.__init__(self, {}, entry_points=entry_points)
+        plugin.Plugin.__init__(self, name, dist)
 
-    def _load_plugin(self, name, dist, plugin, config):
+    def _load_plugin(self, name, dist, plugin, initial_config, config):
         return super(Commands, self)._load_plugin(
-            name, dist, plugin, config,
+            name, dist, plugin, initial_config, config,
             entry_points=self.entry_points + '.' + name
         )
 
@@ -93,10 +93,6 @@ class ConsoleScript(Commands):
 class Command(plugin.Plugin):
     """The base class of all the commands"""
     DESC = ''
-
-    def __init__(self, name, dist, **config):
-        super(Command, self).__init__(name, dist, **config)
-        self.name = name
 
     def find_subcommand(self, names, args):
         return names + (self.name,), self, args
