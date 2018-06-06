@@ -10,8 +10,27 @@
 import os
 import sys
 import argparse
+from argparse import ArgumentError
 
 from nagare.services import plugin, plugins
+
+
+class ArgumentError(ValueError):
+    def __init__(self, status=2, message=None):
+        super(ArgumentError, self).__init__((status, message))
+
+    @property
+    def status(self):
+        return self.args[0][0]
+
+    @property
+    def message(self):
+        return self.args[0][1]
+
+
+class ArgumentParser(argparse.ArgumentParser):
+    def exit(self, status=0, message=': : '):
+        raise ArgumentError(status, message.split(': ', 2)[2].strip())
 
 
 class Command(plugin.Plugin):
@@ -21,6 +40,9 @@ class Command(plugin.Plugin):
     def __call__(self, names, args):
         return self, names + (self.name,), args
 
+    def _create_parser(self, name):
+        return ArgumentParser(name, description=self.DESC)
+
     def set_arguments(self, parser):
         """Define the available options for this command
        """
@@ -29,10 +51,10 @@ class Command(plugin.Plugin):
     def parse(self, names, args):
         """Parse the command line
         """
-        parser = argparse.ArgumentParser(prog=' '.join(names), description=self.DESC)
+        parser = self._create_parser(' '.join(names))
         self.set_arguments(parser)
 
-        return vars(parser.parse_args(args))
+        return parser, vars(parser.parse_args(args))
 
     @staticmethod
     def run(**args):
@@ -42,9 +64,16 @@ class Command(plugin.Plugin):
         return self.run(**args)
 
     def execute(self, args=None):
-        command, names, args = self((), args if args is not None else sys.argv[1:])
+        try:
+            command, names, args = self((), args if args is not None else sys.argv[1:])
 
-        return 2 if command is None else command._run(**command.parse(names, args))
+            parser, arguments = command.parse(names, args)
+            return command._run(**arguments) or 0
+        except ArgumentError as e:
+            if e.message:
+                print >>sys.stderr, 'error:', e.message
+
+            return e.status
 
 
 class Commands(plugins.Plugins, Command):
@@ -69,9 +98,9 @@ class Commands(plugins.Plugins, Command):
 
             name_max_len = max(map(len, self))
             for name, sub_command in sorted(self.items()):
-                print ' - %s: %s' % (name.ljust(name_max_len), sub_command.DESC)
+                print '  - %s: %s' % (name.ljust(name_max_len), sub_command.DESC)
 
-        return None, None, None
+        raise ArgumentError(status=0)
 
     def __call__(self, names, args):
         subcommand = args.pop(0) if args else None
@@ -79,5 +108,5 @@ class Commands(plugins.Plugins, Command):
         return self.get(subcommand, self.usage)(names + (self.name,), args)
 
 
-def run(entry_points, commands=Commands):
-    return commands(entry_points=entry_points).execute()
+def run(entry_points):
+    return Commands(entry_points=entry_points).execute()
