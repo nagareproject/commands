@@ -10,7 +10,6 @@
 import os
 import sys
 import argparse
-from argparse import ArgumentError
 
 from nagare.services import plugin, plugins
 
