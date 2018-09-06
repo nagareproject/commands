@@ -70,7 +70,7 @@ class Command(plugin.Plugin):
             return command._run(**arguments) or 0
         except ArgumentError as e:
             if e.message:
-                print >>sys.stderr, 'error:', e.message
+                sys.stderr.write('error: %s\n' % e.message)
 
             return e.status
 
@@ -90,14 +90,13 @@ class Commands(plugins.Plugins, Command):
         )
 
     def usage(self, names, _):
-        print 'Usage: ' + ' '.join(names) + (' <command>' if self else '')
+        print('Usage: ' + ' '.join(names) + (' <command>' if self else ''))
         if self:
-            print
-            print 'with <command>:'
+            print('\nwith <command>:')
 
             name_max_len = max(map(len, self))
             for name, sub_command in sorted(self.items()):
-                print '  - %s: %s' % (name.ljust(name_max_len), sub_command.DESC)
+                print('  - %s: %s' % (name.ljust(name_max_len), sub_command.DESC))
 
         raise ArgumentError(status=0)
 
