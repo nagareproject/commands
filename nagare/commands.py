@@ -56,11 +56,11 @@ class Command(plugin.Plugin):
         return parser, vars(parser.parse_args(args))
 
     @staticmethod
-    def run(**args):
+    def run(**arguments):
         return 0
 
-    def _run(self, **args):
-        return self.run(**args)
+    def _run(self, next_method=None, **arguments):
+        return (next_method or self.run)(**arguments)
 
     def execute(self, args=None):
         try:
