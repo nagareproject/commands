@@ -47,13 +47,11 @@ class Command(plugin.Plugin):
        """
         pass
 
-    def parse(self, names, args):
+    def parse(self, names, parser, args):
         """Parse the command line
         """
-        parser = self._create_parser(' '.join(names))
         self.set_arguments(parser)
-
-        return parser, vars(parser.parse_args(args))
+        return vars(parser.parse_args(args))
 
     @staticmethod
     def run(**arguments):
@@ -65,12 +63,13 @@ class Command(plugin.Plugin):
     def execute(self, args=None):
         try:
             command, names, args = self((), args if args is not None else sys.argv[1:])
+            parser = self._create_parser(' '.join(names))
 
-            parser, arguments = command.parse(names, args)
+            arguments = command.parse(names, parser, args)
             return command._run(**arguments) or 0
         except ArgumentError as e:
             if e.message:
-                sys.stderr.write('error: %s\n' % e.message)
+                parser._print_message('error: %s\n' % e.message)
 
             return e.status
 
@@ -84,19 +83,24 @@ class Commands(plugins.Plugins, Command):
         Command.__init__(self, name, dist)
 
     def _load_plugin(self, name, dist, plugin, initial_config, config):
-        return super(Commands, self)._load_plugin(
+        command, config = super(Commands, self)._load_plugin(
             name, dist, plugin, initial_config, config,
             entry_points=self.entry_points + '.' + name
         )
 
-    def usage(self, names, _):
-        print('Usage: ' + ' '.join(names) + (' <command>' if self else ''))
+        command.plugin_category = self.entry_points
+        return command, config
+
+    def usage(self, names, _, display=None):
+        display = display or (lambda m: sys.stderr.write(m + '\n'))
+        display('Usage: ' + ' '.join(names) + (' <command>' if self else ''))
         if self:
-            print('\nwith <command>:')
+            display('')
+            display('with <command>:')
 
             name_max_len = max(map(len, self))
             for name, sub_command in sorted(self.items()):
-                print('  - %s: %s' % (name.ljust(name_max_len), sub_command.DESC))
+                display('  - %s: %s' % (name.ljust(name_max_len), sub_command.DESC))
 
         raise ArgumentError(status=0)
 

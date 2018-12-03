@@ -15,5 +15,4 @@ tests:
   script:
     - /opt/stackless/bin/pip install flake8
     - /opt/stackless/bin/flake8 nagare
-    - /opt/stackless/bin/python setup.py test
 
