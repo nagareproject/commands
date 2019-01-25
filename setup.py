@@ -1,7 +1,7 @@
 # Encoding: utf-8
 
 # --
-# Copyright (c) 2008-2018 Net-ng.
+# Copyright (c) 2008-2019 Net-ng.
 # All rights reserved.
 #
 # This software is licensed under the BSD License, as described in
@@ -30,8 +30,7 @@ setup(
     url='https://github.com/nagareproject/commands',
     packages=find_packages(),
     zip_safe=False,
-    setup_requires=['setuptools_scm', 'pytest-runner'],
+    setup_requires=['setuptools_scm'],
     use_scm_version=True,
-    install_requires=['nagare-services'],
-    tests_require=['pytest']
+    install_requires=['nagare-services']
 )
