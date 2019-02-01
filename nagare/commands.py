@@ -36,6 +36,9 @@ class Command(plugin.Plugin):
     def __init__(self, name=None, dist=None, **config):
         super(Command, self).__init__(name if name is not None else os.path.basename(sys.argv[0]), dist, **config)
 
+    def usage_name(self, ljust=0):
+        return self.name.ljust(ljust)
+
     def __call__(self, names, args):
         return self, names + (self.name,), args
 
@@ -99,8 +102,11 @@ class Commands(plugins.Plugins, Command):
             display('with <command>:')
 
             name_max_len = max(map(len, self))
-            for name, sub_command in sorted(self.items()):
-                display('  - %s: %s' % (name.ljust(name_max_len), sub_command.DESC))
+            for _, sub_command in sorted(self.items()):
+                display('  - {}: {}'.format(
+                    sub_command.usage_name(name_max_len),
+                    sub_command.DESC
+                ))
 
         raise ArgumentError(status=0)
 
