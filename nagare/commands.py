@@ -39,9 +39,6 @@ class Command(plugin.Plugin):
     def usage_name(self, ljust=0):
         return self.name.ljust(ljust)
 
-    def __call__(self, names, args):
-        return self, names + (self.name,), args
-
     def _create_parser(self, name):
         return ArgumentParser(name, description=self.DESC)
 
@@ -57,22 +54,25 @@ class Command(plugin.Plugin):
         return vars(parser.parse_args(args))
 
     @staticmethod
-    def run(**arguments):
+    def run(command_names, **arguments):
         return 0
 
-    def _run(self, next_method=None, **arguments):
-        return (next_method or self.run)(**arguments)
+    def _run(self, command_names, next_method=None, **arguments):
+        return (next_method or self.run)(command_names, **arguments)
 
-    def execute(self, args=None):
+    def execute(self, command_names=None, args=None):
+        command_names = command_names or (self.name,)
+        if args is None:
+            args = sys.argv[1:]
+
         try:
-            command, names, args = self((), args if args is not None else sys.argv[1:])
-            parser = self._create_parser(' '.join(names))
+            parser = self._create_parser(' '.join(command_names))
+            arguments = self.parse(command_names, parser, args)
 
-            arguments = command.parse(names, parser, args)
-            return command._run(**arguments) or 0
+            return self._run(command_names, **arguments) or 0
         except ArgumentError as e:
             if e.message:
-                parser._print_message('error: %s\n' % e.message)
+                parser._print_message('error: {}\n'.format(e.message))
 
             return e.status
 
@@ -94,7 +94,19 @@ class Commands(plugins.Plugins, Command):
         command.plugin_category = self.entry_points
         return command, config
 
-    def usage(self, names, _, display=None):
+    def set_arguments(self, parser):
+        super(Commands, self).set_arguments(parser)
+        parser.add_argument('subcommands', nargs='...')
+
+    def run(self, command_names, subcommands):
+        if subcommands:
+            subcommand = self.get(subcommands.pop(0))
+            if subcommand is not None:
+                return subcommand.execute(command_names + (self.name,), subcommands)
+
+        return self.usage(command_names)
+
+    def usage(self, names, display=None):
         display = display or (lambda m: sys.stderr.write(m + '\n'))
         display('Usage: ' + ' '.join(names) + (' <command>' if self else ''))
         if self:
@@ -109,11 +121,6 @@ class Commands(plugins.Plugins, Command):
                 ))
 
         raise ArgumentError(status=0)
-
-    def __call__(self, names, args):
-        subcommand = args.pop(0) if args else None
-
-        return self.get(subcommand, self.usage)(names + (self.name,), args)
 
 
 def run(entry_points):
