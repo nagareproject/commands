@@ -47,7 +47,7 @@ class Command(plugin.Plugin):
        """
         pass
 
-    def parse(self, names, parser, args):
+    def parse(self, parser, args):
         """Parse the command line
         """
         self.set_arguments(parser)
@@ -60,14 +60,14 @@ class Command(plugin.Plugin):
     def _run(self, command_names, next_method=None, **arguments):
         return (next_method or self.run)(command_names, **arguments)
 
-    def execute(self, command_names=None, args=None):
-        command_names = command_names or (self.name,)
+    def execute(self, command_names=(), args=None):
+        command_names += (self.name,)
         if args is None:
             args = sys.argv[1:]
 
         try:
             parser = self._create_parser(' '.join(command_names))
-            arguments = self.parse(command_names, parser, args)
+            arguments = self.parse(parser, args)
 
             return self._run(command_names, **arguments) or 0
         except ArgumentError as e:
@@ -102,7 +102,7 @@ class Commands(plugins.Plugins, Command):
         if subcommands:
             subcommand = self.get(subcommands.pop(0))
             if subcommand is not None:
-                return subcommand.execute(command_names + (self.name,), subcommands)
+                return subcommand.execute(command_names, subcommands)
 
         return self.usage(command_names)
 
