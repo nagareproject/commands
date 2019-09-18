@@ -14,22 +14,27 @@ import argparse
 from nagare.services import plugin, plugins
 
 
-class ArgumentError(ValueError):
-    def __init__(self, status=2, message=None):
-        super(ArgumentError, self).__init__((status, message))
-
-    @property
-    def status(self):
-        return self.args[0][0]
+class CommandError(ValueError):
+    def __init__(self, message='', status=1):
+        super(CommandError, self).__init__((message, status))
 
     @property
     def message(self):
+        return self.args[0][0]
+
+    @property
+    def status(self):
         return self.args[0][1]
+
+
+class ArgumentError(CommandError):
+    def __init__(self, message='', status=2):
+        super(ArgumentError, self).__init__(message, status)
 
 
 class ArgumentParser(argparse.ArgumentParser):
     def exit(self, status=0, message=': : '):
-        raise ArgumentError(status, message.split(': ', 2)[2].strip())
+        raise ArgumentError(message.split(': ', 2)[2].strip(), status)
 
 
 class Command(plugin.Plugin):
@@ -69,12 +74,14 @@ class Command(plugin.Plugin):
             parser = self._create_parser(' '.join(command_names))
             arguments = self.parse(parser, args)
 
-            return self._run(command_names, **arguments) or 0
-        except ArgumentError as e:
+            status = self._run(command_names, **arguments) or 0
+        except CommandError as e:
+            status = e.status
+
             if e.message:
                 parser._print_message('error: {}\n'.format(e.message))
 
-            return e.status
+        return status
 
 
 class Commands(plugins.Plugins, Command):
