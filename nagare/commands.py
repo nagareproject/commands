@@ -98,7 +98,7 @@ class Commands(plugins.Plugins, Command):
             entry_points=self.entry_points + '.' + name
         )
 
-        command.PLUGIN_CATEGOY = self.entry_points
+        command.PLUGIN_CATEGORY = self.entry_points
         return command
 
     def set_arguments(self, parser):
