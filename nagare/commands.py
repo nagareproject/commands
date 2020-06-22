@@ -122,8 +122,9 @@ class Commands(plugins.Plugins, Command):
 
             name_max_len = max(map(len, self))
             for _, sub_command in sorted(self.items()):
-                display('  - {}: {}'.format(
+                display('  - {}{}{}'.format(
                     sub_command.usage_name(name_max_len),
+                    ': ' if sub_command.DESC else '',
                     sub_command.DESC
                 ))
 
