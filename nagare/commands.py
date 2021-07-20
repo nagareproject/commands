@@ -89,13 +89,17 @@ class Commands(plugins.Plugins, Command):
 
     def __init__(self, name=None, dist=None, entry_points=None):
         self.entry_points = entry_points
-        plugins.Plugins.__init__(self, {}, entry_points=entry_points)
+        plugins.Plugins.__init__(self)
         Command.__init__(self, name, dist)
 
-    def _load_plugin(self, name, dist, plugin, initial_config, config):
+        self.load_plugins(name, entry_points=entry_points)
+
+    def _load_plugin(self, name_, dist, plugin, **config):
         command = super(Commands, self)._load_plugin(
-            name, dist, plugin, initial_config, config,
-            entry_points=self.entry_points + '.' + name
+            name_, dist, plugin,
+            activated=True,
+            entry_points=self.entry_points + '.' + name_,
+            **config
         )
 
         command.PLUGIN_CATEGORY = self.entry_points
@@ -106,6 +110,7 @@ class Commands(plugins.Plugins, Command):
         parser.add_argument('subcommands', nargs='...')
 
     def run(self, command_names, subcommands):
+        self.load_plugins(self.name)
         if subcommands:
             subcommand = self.get(subcommands.pop(0))
             if subcommand is not None:
