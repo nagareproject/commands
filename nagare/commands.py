@@ -79,7 +79,7 @@ class Command(plugin.Plugin):
             status = e.status
 
             if e.message:
-                parser._print_message('error: {}\n'.format(e.message))
+                parser._print_message('Command failed: {}\n'.format(e.message))
 
         return status
 
