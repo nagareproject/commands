@@ -1,5 +1,5 @@
 # --
-# Copyright (c) 2008-2022 Net-ng.
+# Copyright (c) 2008-2023 Net-ng.
 # All rights reserved.
 #
 # This software is licensed under the BSD License, as described in
@@ -7,9 +7,9 @@
 # this distribution.
 # --
 
+import argparse
 import os
 import sys
-import argparse
 
 from nagare.services import plugin, plugins
 
@@ -48,13 +48,10 @@ class Command(plugin.Plugin):
         return ArgumentParser(name, description=self.DESC)
 
     def set_arguments(self, parser):
-        """Define the available options for this command
-       """
-        pass
+        """Define the available options for this command."""
 
     def parse(self, parser, args):
-        """Parse the command line
-        """
+        """Parse the command line."""
         self.set_arguments(parser)
         return vars(parser.parse_args(args))
 
@@ -80,6 +77,7 @@ class Command(plugin.Plugin):
 
             if e.message:
                 parser._print_message('Command failed: {}\n'.format(e.message))
+                parser.end()
 
         return status
 
@@ -96,10 +94,7 @@ class Commands(plugins.Plugins, Command):
 
     def _load_plugin(self, name_, dist, plugin, **config):
         command = super(Commands, self)._load_plugin(
-            name_, dist, plugin,
-            activated=True,
-            entry_points=self.entry_points + '.' + name_,
-            **config
+            name_, dist, plugin, activated=True, entry_points=self.entry_points + '.' + name_, **config
         )
 
         command.PLUGIN_CATEGORY = self.entry_points
@@ -127,11 +122,11 @@ class Commands(plugins.Plugins, Command):
 
             name_max_len = max(map(len, self))
             for _, sub_command in sorted(self.items()):
-                display('  - {}{}{}'.format(
-                    sub_command.usage_name(name_max_len),
-                    ': ' if sub_command.DESC else '',
-                    sub_command.DESC
-                ))
+                display(
+                    '  - {}{}{}'.format(
+                        sub_command.usage_name(name_max_len), ': ' if sub_command.DESC else '', sub_command.DESC
+                    )
+                )
 
         raise ArgumentError(status=0)
 
