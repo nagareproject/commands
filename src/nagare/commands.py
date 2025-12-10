@@ -1,5 +1,5 @@
 # --
-# Copyright (c) 2008-2024 Net-ng.
+# Copyright (c) 2008-2025 Net-ng.
 # All rights reserved.
 #
 # This software is licensed under the BSD License, as described in
@@ -16,7 +16,7 @@ from nagare.services import plugin, plugins
 
 class CommandError(ValueError):
     def __init__(self, message='', status=1):
-        super(CommandError, self).__init__((message, status))
+        super().__init__((message, status))
 
     @property
     def message(self):
@@ -29,7 +29,7 @@ class CommandError(ValueError):
 
 class ArgumentError(CommandError):
     def __init__(self, message='', status=2):
-        super(ArgumentError, self).__init__(message, status)
+        super().__init__(message, status)
 
 
 class ArgumentParser(argparse.ArgumentParser):
@@ -39,7 +39,7 @@ class ArgumentParser(argparse.ArgumentParser):
 
 class Command(plugin.Plugin):
     def __init__(self, name=None, dist=None, **config):
-        super(Command, self).__init__(name if name is not None else os.path.basename(sys.argv[0]), dist, **config)
+        super().__init__(name if name is not None else os.path.basename(sys.argv[0]), dist, **config)
 
     def usage_name(self, ljust=0):
         return self.name.ljust(ljust)
@@ -87,13 +87,14 @@ class Commands(plugins.Plugins, Command):
 
     def __init__(self, name=None, dist=None, entry_points=None):
         self.entry_points = entry_points
+
         plugins.Plugins.__init__(self)
         Command.__init__(self, name, dist)
 
         self.load_plugins(name, entry_points=entry_points)
 
     def _load_plugin(self, name_, dist, plugin, **config):
-        command = super(Commands, self)._load_plugin(
+        command = super()._load_plugin(
             name_, dist, plugin, activated=True, entry_points=self.entry_points + '.' + name_, **config
         )
 
@@ -101,7 +102,7 @@ class Commands(plugins.Plugins, Command):
         return command
 
     def set_arguments(self, parser):
-        super(Commands, self).set_arguments(parser)
+        super().set_arguments(parser)
         parser.add_argument('subcommands', nargs='...')
 
     def run(self, command_names, subcommands):

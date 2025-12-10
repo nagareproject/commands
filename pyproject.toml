@@ -1,10 +1,10 @@
-# =-
-# (C)opyright Net-ng 2024
+# --
+# (C)opyright Net-ng 2025
 #
 # This is Net-ng proprietary source code
 # Any reproduction modification or use without prior written
 # approval from Net-ng is strictly forbidden.
-# =-
+# --
 
 [build-system]
 requires = ['setuptools', 'wheel', 'setuptools_scm']
@@ -16,15 +16,11 @@ build-backend = 'setuptools.build_meta'
 name = 'nagare-commands'
 dynamic = ['version']
 description = 'Multi-levels CLI commands'
-authors = [
-    {name = 'Net-ng'},
-    {email = 'contact@net-ng.com'}
-]
-license = {file = 'LICENSE.txt'}
+authors = [{ name = 'Net-ng' }, { email = 'contact@net-ng.com' }]
+license = { file = 'LICENSE.txt' }
 requires-python = '>=3.7'
-dependencies = [
-    'nagare-services'
-]
+dependencies = ['nagare-services']
+
 [project.readme]
 file = 'README.rst'
 content-type = 'text/x-rst'
@@ -37,7 +33,7 @@ dev = [
     'ruff',
     'pytest',
     'build',
-    'twine'
+    'twine',
 ]
 
 [project.urls]
@@ -47,26 +43,31 @@ Source = 'https://github.com/nagareproject/commands'
 Tracker = 'https://github.com/nagareproject/commands/issues'
 
 [tool.ruff]
-select = ['C4', 'COM', 'D', 'E', 'ERA', 'F', 'I', 'ISC', 'INP', 'PIE', 'Q', 'S', 'SIM', 'TID', 'W', 'YTT']
-ignore = ['COM812', 'D10', 'ISC001']
-line-length = 120
 src = ['src']
+line-length = 120
+format.quote-style = 'single'
 
-[tool.ruff.per-file-ignores]
-'src/nagare/services/tests/*' = ['S']
+[tool.ruff.lint]
+select = [
+    'C4',
+    'COM',
+    'D',
+    'E',
+    'ERA',
+    'F',
+    'I',
+    'ISC',
+    'INP',
+    'PIE',
+    'Q',
+    'S',
+    'SIM',
+    'TID',
+    'W',
+    'YTT',
+]
+ignore = ['COM812', 'D10', 'ISC001']
+isort.length-sort = true
+pydocstyle.convention = 'google'
+flake8-quotes.inline-quotes = 'single'
 
-[tool.ruff.flake8-quotes]
-inline-quotes = 'single'
-multiline-quotes = 'double'
-
-[tool.ruff.pydocstyle]
-convention = 'google'
-
-[tool.ruff.isort]
-length-sort = true
-
-[tool.ruff.format]
-quote-style = 'single'
-
-[tool.pytest.ini_options]
-testpaths = ['tests']
