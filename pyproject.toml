@@ -1,9 +1,10 @@
 # --
-# (C)opyright Net-ng 2025
+# Copyright (c) 2008-2025 Net-ng.
+# All rights reserved.
 #
-# This is Net-ng proprietary source code
-# Any reproduction modification or use without prior written
-# approval from Net-ng is strictly forbidden.
+# This software is licensed under the BSD License, as described in
+# the file LICENSE.txt, which you should have received as part of
+# this distribution.
 # --
 
 [build-system]
@@ -18,7 +19,7 @@ dynamic = ['version']
 description = 'Multi-levels CLI commands'
 authors = [{ name = 'Net-ng' }, { email = 'contact@net-ng.com' }]
 license = { file = 'LICENSE.txt' }
-requires-python = '>=3.7'
+requires-python = '>=3.9'
 dependencies = ['nagare-services']
 
 [project.readme]
@@ -70,4 +71,3 @@ ignore = ['COM812', 'D10', 'ISC001']
 isort.length-sort = true
 pydocstyle.convention = 'google'
 flake8-quotes.inline-quotes = 'single'
-
