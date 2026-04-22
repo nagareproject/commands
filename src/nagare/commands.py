@@ -1,5 +1,5 @@
 # --
-# Copyright (c) 2008-2025 Net-ng.
+# Copyright (c) 2014-2026 Net-ng.
 # All rights reserved.
 #
 # This software is licensed under the BSD License, as described in
@@ -93,9 +93,9 @@ class Commands(plugins.Plugins, Command):
 
         self.load_plugins(name, entry_points=entry_points)
 
-    def _load_plugin(self, name_, dist, plugin, **config):
+    def _load_plugin(self, name_, dist_, plugin_, **config):
         command = super()._load_plugin(
-            name_, dist, plugin, activated=True, entry_points=self.entry_points + '.' + name_, **config
+            name_, dist_, plugin_, activated=True, entry_points=self.entry_points + '.' + name_, **config
         )
 
         command.PLUGIN_CATEGORY = self.entry_points
