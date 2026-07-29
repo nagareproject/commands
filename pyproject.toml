@@ -19,23 +19,12 @@ dynamic = ['version']
 description = 'Multi-levels CLI commands'
 authors = [{ name = 'Net-ng' }, { email = 'contact@net-ng.com' }]
 license = { file = 'LICENSE.txt' }
-requires-python = '>=3.9'
+requires-python = '>=3.10'
 dependencies = ['nagare-services']
 
 [project.readme]
 file = 'README.rst'
 content-type = 'text/x-rst'
-
-[project.optional-dependencies]
-dev = [
-    'sphinx',
-    'sphinx_rtd_theme',
-    'pre-commit',
-    'ruff',
-    'pytest',
-    'build',
-    'twine',
-]
 
 [project.urls]
 Homepage = 'https://nagare.org'

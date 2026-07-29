@@ -33,6 +33,9 @@ class ArgumentError(CommandError):
 
 
 class ArgumentParser(argparse.ArgumentParser):
+    def end(self):
+        pass
+
     def exit(self, status=0, message=': : '):
         raise ArgumentError(message.split(': ', 2)[2].strip(), status)
 
@@ -76,7 +79,7 @@ class Command(plugin.Plugin):
             status = e.status
 
             if e.message:
-                parser._print_message('Command failed: {}\n'.format(e.message))
+                parser._print_message(f'Command failed: {e.message}\n')
                 parser.end()
 
         return status

@@ -1,3 +1,5 @@
+# Encoding: utf-8
+
 # --
 # Copyright (c) 2014-2026 Net-ng.
 # All rights reserved.
@@ -8,7 +10,8 @@
 # --
 
 tests:
+  image: ghcr.io/astral-sh/uv:trixie-slim
+
   script:
-    - pip3 install ruff
-    - ruff check src
-    - ruff format --check src
+    - uvx ruff format --check src
+    - uvx ruff check src
